@@ -1,50 +1,49 @@
-'use strict';
+import gulp from 'gulp';
+import eslint from 'gulp-eslint';
+import jade from 'gulp-jade';
+import stylus from 'gulp-stylus';
+import chalk from 'chalk';
+import del from 'del';
+import runSeq from 'run-sequence';
+import browserSync from 'browser-sync';
+import browserify from 'browserify';
+import babelify from 'babelify';
+import source from 'vinyl-source-stream';
 
-var gulp = require('gulp'),
-    eslint = require('gulp-eslint'),
-    jade = require('gulp-jade'),
-    stylus = require('gulp-stylus'),
-    chalk = require('chalk'),
-    del = require('del'),
-    runSeq = require('run-sequence'),
-    browserSync = require('browser-sync').create(),
-    browserify = require('browserify'),
-    babelify = require('babelify'),
-    source = require('vinyl-source-stream'),
-    paths = {
-      scripts: ['src/js/**/*.js'],
-      templates: ['src/**/*.jade'],
-      stylus: ['src/stylus/**/*.styl'],
-      appStylus: 'src/stylus/app.styl',
-      dist: 'dist'
-    };
+const paths = {
+  scripts: ['src/js/**/*.js'],
+  templates: ['src/**/*.jade'],
+  stylus: ['src/stylus/**/*.styl'],
+  appStylus: 'src/stylus/app.styl',
+  dist: 'dist'
+};
 
-gulp.task('clean', function () {
+gulp.task('clean', () => {
   return del(paths.dist);
 });
 
-gulp.task('build-templates', function () {
+gulp.task('build-templates', () => {
   return gulp.src(paths.templates)
     .pipe(jade())
     .pipe(gulp.dest(paths.dist))
     .pipe(browserSync.stream());
 });
 
-gulp.task('build-css', function () {
+gulp.task('build-css', () => {
   return gulp.src(paths.appStylus)
     .pipe(stylus())
     .pipe(gulp.dest('dist'))
     .pipe(browserSync.stream());
 });
 
-gulp.task('lint', function () {
+gulp.task('lint', () => {
   return gulp.src(paths.scripts)
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError());
 });
 
-gulp.task('build-js', ['lint'], function () {
+gulp.task('build-js', ['lint'], () => {
   return browserify({
       entries: 'src/js/app.js',
       extensions: '.js',
@@ -61,7 +60,7 @@ gulp.task('watch-js', ['build-js'], browserSync.reload);
 gulp.task('watch-templates', ['build-templates'], browserSync.reload);
 gulp.task('watch-stylus', ['build-css'], browserSync.reload);
 
-gulp.task('serve', ['build'], function () {
+gulp.task('serve', ['build'], () => {
   browserSync.init({
     server: { baseDir: paths.dist }
   });
@@ -70,7 +69,7 @@ gulp.task('serve', ['build'], function () {
   gulp.watch(paths.stylus, ['watch-stylus']);
 });
 
-gulp.task('build', ['clean'], function () {
+gulp.task('build', ['clean'], () => {
   return runSeq(['build-js','build-css', 'build-templates']);
 });
 
