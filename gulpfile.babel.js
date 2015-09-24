@@ -9,9 +9,11 @@ import browserSync from 'browser-sync';
 import browserify from 'browserify';
 import babelify from 'babelify';
 import source from 'vinyl-source-stream';
+import fs from 'fs';
 
 const paths = {
   scripts: ['src/js/**/*.js'],
+  sketches: 'src/js/sketches/',
   templates: ['src/**/*.jade'],
   stylus: ['src/stylus/**/*.styl'],
   appStylus: 'src/stylus/app.styl',
@@ -23,8 +25,19 @@ gulp.task('clean', () => {
 });
 
 gulp.task('build-templates', () => {
+  // TODO - use config file to control order of links.
+  let links = fs.readdirSync(paths.sketches).map((file) => {
+    let fname = file.slice(0, -3);
+    return {
+      name: fname, 
+      href: `${fname}.html`
+    };
+  });
+
   return gulp.src(paths.templates)
-    .pipe(jade())
+    .pipe(jade({
+      locals: {links: links}
+    }))
     .pipe(gulp.dest(paths.dist))
     .pipe(browserSync.stream());
 });

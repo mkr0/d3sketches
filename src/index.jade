@@ -4,5 +4,7 @@ html(lang="en")
       title="d3 sketches"
       link(rel="stylesheet" href="app.css")
     body
-      h1 hello hi
+      ul
+        each link in links
+          li: a(href=link.href)= link.name
       script(type="text/javascript" src="dist.js")
